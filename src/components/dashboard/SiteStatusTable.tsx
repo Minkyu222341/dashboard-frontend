@@ -27,25 +27,25 @@ const SiteStatusTable: React.FC<SiteStatusTableProps> = ({ sites }) => {
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                전체 요청
+                완료/전체 요청
               </th>
               <th
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                대기 중
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                완료
+                미완료
               </th>
               <th
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
                 마지막 업데이트
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                로그인 아이디
               </th>
             </tr>
           </thead>
@@ -57,21 +57,25 @@ const SiteStatusTable: React.FC<SiteStatusTableProps> = ({ sites }) => {
                     {site.siteName}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {site.totalRequests}
-                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                    {site.pendingRequests}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    {site.completedRequests}
-                  </span>
+                  <div className="text-sm text-gray-900 flex">
+                    <div className="w-12 text-right text-green-600 font-medium">
+                      {site.completedRequests}
+                    </div>
+                    <div className="mx-1">/</div>
+                    <div className="w-12 text-left font-medium">
+                      {site.totalRequests}
+                    </div>
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Date(site.lastUpdated).toLocaleString('ko-KR')}
+                  {site.pendingRequests}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {new Date(site.lastUpdatedAt).toLocaleString('ko-KR')}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {site.loginId || '정보 없음'}
                 </td>
               </tr>
             ))}

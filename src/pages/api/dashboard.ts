@@ -1,26 +1,43 @@
 // pages/api/dashboard.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { mockSiteStatuses } from '@/utils/mockData';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   try {
-    const apiUrl = process.env.BACKEND_API_URL || 'http://localhost:8081';
+    // 백엔드 API 응답 형식에 맞게 mockSiteStatuses를 반환
+    // dashboardService.ts의 DashBoardResponseDto[] 형식으로 변환해야 함
+    const mockResponseData = mockSiteStatuses.map(site => ({
+      siteCode: site.siteCode,
+      siteName: site.siteName,
+      completedCount: site.completedRequests,
+      notCompletedCount: site.pendingRequests,
+      totalCount: site.totalRequests,
+      lastUpdatedAt: site.lastUpdatedAt,
+    }));
 
+    // 백엔드 호출 대신 목업 데이터 사용
+    res.status(200).json(mockResponseData);
+
+    /* 실제 API 호출 코드 (주석 처리)
+    const apiUrl = process.env.BACKEND_API_URL;
+    
     const response = await fetch(`${apiUrl}/dashboard`, {
       method: req.method,
       headers: {
         'Content-Type': 'application/json',
       },
     });
-
+    
     if (!response.ok) {
       throw new Error(`Backend responded with status: ${response.status}`);
     }
-
+    
     const data = await response.json();
     res.status(200).json(data);
+    */
   } catch (error) {
     console.error('API proxy error:', error);
     res.status(500).json({ error: 'Failed to fetch data from backend' });
