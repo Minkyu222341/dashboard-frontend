@@ -27,7 +27,7 @@ const StatusChart: React.FC<StatusChartProps> = ({ sites }) => {
     // 차트 데이터 준비
     const labels = sites.map(site => site.siteName);
 
-    // 새 차트 인스턴스 생성 - 스택 형태가 아닌 병렬 형태로 변경
+    // 새 차트 인스턴스 생성 - "완료 요청"과 "요청 개수"로 변경
     chartInstance.current = new ChartJS(canvas, {
       type: 'bar',
       data: {
@@ -36,14 +36,12 @@ const StatusChart: React.FC<StatusChartProps> = ({ sites }) => {
           {
             label: '완료 요청',
             data: sites.map(site => site.completedRequests),
-            backgroundColor: '#4ade80',
-            // 스택 속성 제거
+            backgroundColor: '#4ade80', // 초록색 유지
           },
           {
-            label: '미완료 요청',
-            data: sites.map(site => site.pendingRequests),
-            backgroundColor: '#fbbf24',
-            // 스택 속성 제거
+            label: '요청 개수',
+            data: sites.map(site => site.totalRequests),
+            backgroundColor: '#60a5fa', // 파란색 계열로 변경
           },
         ],
       },
@@ -67,7 +65,6 @@ const StatusChart: React.FC<StatusChartProps> = ({ sites }) => {
             // 스택 비활성화 (기본값이 false)
           },
           y: {
-            // 스택 비활성화 (기본값이 false)
             beginAtZero: true,
           },
         },

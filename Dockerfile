@@ -11,13 +11,10 @@ RUN npm ci && \
     npm install --save chart.js axios && \
     npm install --save-dev eslint-plugin-prettier eslint-config-prettier
 
-# 소스 코드 복사
+# 소스 코드 복사 (이 시점에 .env.local 파일도 같이 복사됨)
 COPY . .
 
-# 환경 변수 파일 복사 (.env.production이 있는 경우)
-COPY .env.local .env.local
-
-# ESLint 관련 오류 무시하도록 설정
+# ESLint 관련 설정
 ENV ESLINT_NO_DEV_ERRORS=true
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_OPTIONS="--max-old-space-size=4096"

@@ -20,24 +20,6 @@ export default async function handler(
 
     // 백엔드 호출 대신 목업 데이터 사용
     res.status(200).json(mockResponseData);
-
-    /* 실제 API 호출 코드 (주석 처리)
-    const apiUrl = process.env.BACKEND_API_URL;
-    
-    const response = await fetch(`${apiUrl}/dashboard`, {
-      method: req.method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Backend responded with status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    res.status(200).json(data);
-    */
   } catch (error) {
     console.error('API proxy error:', error);
     res.status(500).json({ error: 'Failed to fetch data from backend' });

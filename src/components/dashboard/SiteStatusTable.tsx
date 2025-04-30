@@ -63,12 +63,12 @@ const SiteStatusTable: React.FC<SiteStatusTableProps> = ({ sites }) => {
                       {site.completedRequests}
                     </div>
                     <div className="mx-1">/</div>
-                    <div className="w-12 text-left font-medium">
+                    <div className="w-12 text-left font-medium text-blue-600">
                       {site.totalRequests}
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-orange-600 text-sm text-gray-500">
                   {site.pendingRequests}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
