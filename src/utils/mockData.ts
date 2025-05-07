@@ -4,10 +4,14 @@ import {
   AccountInfoResponseDto,
 } from '@/services/dashboardService';
 
+export const mockScheduleStatus = {
+  status: true, // 기본적으로 스케줄링 활성화 상태
+};
+
 export const mockSiteStatuses: SiteStatus[] = [
   {
     siteCode: 'site_a',
-    siteName: 'A 사이트',
+    siteName: '부산교육청행정 지원센터',
     totalRequests: 145,
     pendingRequests: 23,
     completedRequests: 122,
@@ -15,7 +19,7 @@ export const mockSiteStatuses: SiteStatus[] = [
   },
   {
     siteCode: 'site_b',
-    siteName: 'B 사이트',
+    siteName: '경상국립대학교 헬프센터',
     totalRequests: 89,
     pendingRequests: 12,
     completedRequests: 77,
@@ -23,7 +27,7 @@ export const mockSiteStatuses: SiteStatus[] = [
   },
   {
     siteCode: 'site_c',
-    siteName: 'C 사이트',
+    siteName: '부산교육청본청 헬프센터',
     totalRequests: 56,
     pendingRequests: 8,
     completedRequests: 48,
@@ -31,7 +35,7 @@ export const mockSiteStatuses: SiteStatus[] = [
   },
   {
     siteCode: 'site_d',
-    siteName: 'D 사이트',
+    siteName: '창원대학교 헬프센터',
     totalRequests: 200,
     pendingRequests: 50,
     completedRequests: 150,
@@ -39,7 +43,7 @@ export const mockSiteStatuses: SiteStatus[] = [
   },
   {
     siteCode: 'site_e',
-    siteName: 'E 사이트',
+    siteName: '늘봄학교 서비스 헬프센터',
     totalRequests: 300,
     pendingRequests: 100,
     completedRequests: 200,
@@ -47,7 +51,7 @@ export const mockSiteStatuses: SiteStatus[] = [
   },
   {
     siteCode: 'site_f',
-    siteName: 'F 사이트',
+    siteName: '서울교대 헬프센터',
     totalRequests: 400,
     pendingRequests: 150,
     completedRequests: 250,
@@ -55,10 +59,26 @@ export const mockSiteStatuses: SiteStatus[] = [
   },
   {
     siteCode: 'site_g',
-    siteName: 'G 사이트',
+    siteName: '경상남도교육청 헬프센터',
     totalRequests: 500,
     pendingRequests: 200,
     completedRequests: 300,
+    lastUpdatedAt: new Date().toISOString(),
+  },
+  {
+    siteCode: 'site_h',
+    siteName: '부산교육청학교 헬프센터',
+    totalRequests: 350,
+    pendingRequests: 130,
+    completedRequests: 220,
+    lastUpdatedAt: new Date().toISOString(),
+  },
+  {
+    siteCode: 'site_i',
+    siteName: '한국해양대학교 헬프센터',
+    totalRequests: 210,
+    pendingRequests: 40,
+    completedRequests: 170,
     lastUpdatedAt: new Date().toISOString(),
   },
 ];
@@ -82,11 +102,13 @@ export const mockDashboardSummary: DashboardSummary = {
 
 // 계정 정보 mock 데이터 추가
 export const mockAccountsData: AccountInfoResponseDto[] = [
-  { siteCode: 'site_a', loginId: '임시로그인아이디te_a' },
-  { siteCode: 'site_b', loginId: '임시로그인아이디te_b' },
-  { siteCode: 'site_c', loginId: '임시로그인아이디te_c' },
-  { siteCode: 'site_d', loginId: '임시로그인아이디te_d' },
-  { siteCode: 'site_e', loginId: '임시로그인아이디te_e' },
-  { siteCode: 'site_f', loginId: '임시로그인아이디te_f' },
-  { siteCode: 'site_g', loginId: '임시로그인아이디te_g' },
+  { siteCode: 'site_a', loginId: '부산교육청행정_아이디' },
+  { siteCode: 'site_b', loginId: '경상국립대학교_아이디' },
+  { siteCode: 'site_c', loginId: '부산교육청본청_아이디' },
+  { siteCode: 'site_d', loginId: '창원대학교_아이디' },
+  { siteCode: 'site_e', loginId: '늘봄학교서비스_아이디' },
+  { siteCode: 'site_f', loginId: '서울교대헬프센터_아이디' },
+  { siteCode: 'site_g', loginId: '경상남도교육청_아이디' },
+  { siteCode: 'site_h', loginId: '부산교육청학교_아이디' },
+  { siteCode: 'site_i', loginId: '한국해양대학교_아이디' },
 ];
