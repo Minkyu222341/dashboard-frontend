@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Layout from '@/components/layout/Layout';
 import StatusCard from '@/components/dashboard/StatusCard';
 import SiteStatusTable from '@/components/dashboard/SiteStatusTable';
 import StatusChart from '@/components/dashboard/StatusChart';
-import ScheduleControl from '@/components/dashboard/ScheduleControl';
+import ScheduleIntervalSelector from '@/components/dashboard/ScheduleControl';
 
 import {
   getDashboardSummary,
@@ -24,26 +24,28 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getDashboardSummary();
-        setDashboardData(data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching dashboard data:', err);
-        setError('데이터를 불러오는 중 오류가 발생했습니다.');
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-
-    const interval = setInterval(fetchData, 3 * 60 * 1000);
-    return () => clearInterval(interval);
+  // 대시보드 데이터 가져오기 함수 (초기 로드 및 주기적 갱신용)
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await getDashboardSummary();
+      setDashboardData(data);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      setError('데이터를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  if (loading) {
+  // 초기 데이터 로드
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
+  if (loading && !dashboardData) {
+    // 최초 로딩 시에만 로딩 화면 표시 (갱신 시에는 이전 데이터 유지)
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
@@ -56,7 +58,8 @@ export default function Home() {
     );
   }
 
-  if (error) {
+  if (error && !dashboardData) {
+    // 최초 로드 시 오류가 발생한 경우에만 오류 화면 표시
     return (
       <Layout>
         <div className="bg-red-50 p-4 rounded-md">
@@ -165,33 +168,66 @@ export default function Home() {
           </div>
         )}
 
-        {/* 스케줄링 제어 컴포넌트 추가 */}
-        <ScheduleControl />
+        {/* 갱신 중 오류 표시 */}
+        {error && dashboardData && (
+          <div className="bg-yellow-50 p-4 rounded-md mb-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-yellow-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-yellow-800">
+                  갱신 오류
+                </h3>
+                <div className="mt-2 text-sm text-yellow-700">
+                  <p>{error}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* 스케줄링 제어 컴포넌트 - 데이터 갱신 함수 전달 */}
+        <ScheduleIntervalSelector onDataRefresh={fetchDashboardData} />
+
+        {/* 로딩 중 표시 (이미 데이터가 있는 상태에서 갱신 중인 경우) */}
+        {loading && dashboardData && (
+          <div className="bg-blue-50 p-2 rounded-md mb-4 flex items-center">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
+            <p className="text-sm text-blue-700">
+              데이터를 갱신하는 중입니다...
+            </p>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
           <StatusCard
-            title="전체 사이트 개수"
-            value={dashboardData.totalSites}
-            bgColor="bg-blue-50"
-            textColor="text-blue-600"
-          />
-          <StatusCard
-            title="금일 전체 요청"
-            value={dashboardData.totalRequests}
-            bgColor="bg-indigo-50"
-            textColor="text-indigo-600"
-          />
-          <StatusCard
-            title="미완료 요청"
+            title="미처리"
             value={dashboardData.pendingRequests}
             bgColor="bg-yellow-50"
             textColor="text-yellow-600"
           />
           <StatusCard
-            title="완료 요청"
+            title="완료"
             value={dashboardData.completedRequests}
             bgColor="bg-green-50"
             textColor="text-green-600"
+          />
+          <StatusCard
+            title="전체"
+            value={dashboardData.totalRequests}
+            bgColor="bg-indigo-50"
+            textColor="text-indigo-600"
           />
         </div>
 

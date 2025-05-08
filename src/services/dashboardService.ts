@@ -7,6 +7,7 @@ export interface SiteStatus {
   completedRequests: number;
   lastUpdatedAt: string;
   loginId?: string; // 로그인 아이디 추가
+  sequence: number; // 시퀀스 필드 추가
 }
 
 // 대시보드 요약 정보 타입
@@ -29,6 +30,7 @@ export interface DashBoardResponseDto {
   completedCount: number;
   notCompletedCount: number;
   totalCount: number;
+  sequence: number; // 시퀀스 필드 추가
   lastUpdatedAt: string;
   loginId?: string; // 로그인 아이디 추가
 }
@@ -90,6 +92,7 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
     totalRequests: item.totalCount || 0,
     pendingRequests: item.notCompletedCount || 0,
     completedRequests: item.completedCount || 0,
+    sequence: item.sequence || 0, // 시퀀스 값 추가
     lastUpdatedAt: item.lastUpdatedAt || new Date().toISOString(),
     loginId:
       accountMap.get(item.siteCode) ||

@@ -6,6 +6,21 @@ interface SiteStatusTableProps {
 }
 
 const SiteStatusTable: React.FC<SiteStatusTableProps> = ({ sites }) => {
+  // 날짜 포맷팅 함수 정의
+  const formatDateTime = (dateString: string): string => {
+    const date = new Date(dateString);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  };
+
   return (
     <div className="mt-6 bg-white shadow rounded-lg overflow-hidden">
       <div className="px-4 py-5 border-b border-gray-200 sm:px-6">
@@ -21,25 +36,19 @@ const SiteStatusTable: React.FC<SiteStatusTableProps> = ({ sites }) => {
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
+                번호
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 사이트
               </th>
               <th
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                완료/전체 요청
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                미완료
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                마지막 업데이트
+                미완료/전체 요청
               </th>
               <th
                 scope="col"
@@ -50,8 +59,11 @@ const SiteStatusTable: React.FC<SiteStatusTableProps> = ({ sites }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {sites.map(site => (
+            {sites.map((site, index) => (
               <tr key={site.siteCode}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {index + 1}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">
                     {site.siteName}
@@ -59,20 +71,14 @@ const SiteStatusTable: React.FC<SiteStatusTableProps> = ({ sites }) => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900 flex">
-                    <div className="w-12 text-right text-green-600 font-medium">
-                      {site.completedRequests}
+                    <div className="w-12 text-right font-medium">
+                      {site.pendingRequests}
                     </div>
                     <div className="mx-1">/</div>
-                    <div className="w-12 text-left font-medium text-blue-600">
+                    <div className="w-12 text-left font-medium">
                       {site.totalRequests}
                     </div>
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-orange-600 text-sm text-gray-500">
-                  {site.pendingRequests}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Date(site.lastUpdatedAt).toLocaleString('ko-KR')}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {site.loginId || '정보 없음'}

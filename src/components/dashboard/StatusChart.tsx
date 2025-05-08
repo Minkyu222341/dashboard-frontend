@@ -34,12 +34,12 @@ const StatusChart: React.FC<StatusChartProps> = ({ sites }) => {
         labels,
         datasets: [
           {
-            label: '완료 요청',
-            data: sites.map(site => site.completedRequests),
-            backgroundColor: '#4ade80', // 초록색
+            label: '미처리',
+            data: sites.map(site => site.pendingRequests),
+            backgroundColor: '#fbbf24', // 노란색
           },
           {
-            label: '요청 개수',
+            label: '전체',
             data: sites.map(site => site.totalRequests),
             backgroundColor: '#60a5fa', // 파란색
           },
