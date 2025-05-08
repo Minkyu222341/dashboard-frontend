@@ -6,7 +6,6 @@ interface SiteStatusTableProps {
 }
 
 const SiteStatusTable: React.FC<SiteStatusTableProps> = ({ sites }) => {
-  // 날짜 포맷팅 함수 정의
   const formatDateTime = (dateString: string): string => {
     const date = new Date(dateString);
 
@@ -54,6 +53,12 @@ const SiteStatusTable: React.FC<SiteStatusTableProps> = ({ sites }) => {
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
+                마지막 업데이트
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 로그인 아이디
               </th>
             </tr>
@@ -79,6 +84,9 @@ const SiteStatusTable: React.FC<SiteStatusTableProps> = ({ sites }) => {
                       {site.totalRequests}
                     </div>
                   </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {formatDateTime(site.lastUpdatedAt)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {site.loginId || '정보 없음'}
