@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import Layout from '@/components/layout/Layout';
 import StatusCard from '@/components/dashboard/StatusCard';
 import SiteStatusTable from '@/components/dashboard/SiteStatusTable';
@@ -10,7 +16,6 @@ import {
   DashboardSummary,
 } from '@/services/dashboardService';
 
-// DashboardSummary 인터페이스에 errors 속성 추가
 export interface DashboardSummaryWithErrors extends DashboardSummary {
   errors?: {
     dashboard: boolean;
@@ -23,19 +28,68 @@ export default function Home() {
     useState<DashboardSummaryWithErrors | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [updateCount, setUpdateCount] = useState<number>(0);
+  const isInitialMount = useRef(true);
+  const dataFetchingRef = useRef(false);
 
-  // 대시보드 데이터 가져오기 함수 (초기 로드 및 주기적 갱신용)
+  // 대시보드 데이터 가져오기 함수
   const fetchDashboardData = useCallback(async () => {
+    if (dataFetchingRef.current) return; // 이미 데이터를 가져오는 중이면 중복 호출 방지
+
     try {
-      setLoading(true);
+      dataFetchingRef.current = true;
+
+      // 첫 로딩이 아닌 업데이트인 경우에만 로딩 상태 표시
+      if (!isInitialMount.current) {
+        setLoading(true);
+      }
+
       const data = await getDashboardSummary();
-      setDashboardData(data);
+
+      // 이전 데이터와 비교하여 변경된 경우에만 상태 업데이트
+      setDashboardData(prevData => {
+        if (!prevData) {
+          isInitialMount.current = false;
+          return data;
+        }
+
+        // 전체 숫자 비교
+        if (
+          prevData.totalRequests !== data.totalRequests ||
+          prevData.pendingRequests !== data.pendingRequests ||
+          prevData.completedRequests !== data.completedRequests
+        ) {
+          // 데이터가 변경되면 업데이트 카운트 증가
+          setUpdateCount(count => count + 1);
+          return data;
+        }
+
+        // 사이트별 데이터 비교
+        const hasChanges = data.siteStatuses.some((newSite, index) => {
+          const prevSite = prevData.siteStatuses[index];
+          return (
+            !prevSite ||
+            prevSite.pendingRequests !== newSite.pendingRequests ||
+            prevSite.totalRequests !== newSite.totalRequests ||
+            prevSite.completedRequests !== newSite.completedRequests
+          );
+        });
+
+        if (hasChanges) {
+          setUpdateCount(count => count + 1);
+          return data;
+        }
+
+        return prevData;
+      });
+
       setError(null);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
       setError('데이터를 불러오는 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
+      dataFetchingRef.current = false;
     }
   }, []);
 
@@ -44,8 +98,67 @@ export default function Home() {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
+  // 메모이제이션된 컴포넌트들 - 깜빡임 최소화를 위해 개선
+  const statusCards = useMemo(
+    () => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+        <StatusCard
+          title="요청"
+          value={dashboardData?.pendingRequests ?? 0}
+          bgColor="bg-yellow-50"
+          textColor="text-yellow-600"
+          isLoading={loading && !isInitialMount.current}
+        />
+        <StatusCard
+          title="완료"
+          value={dashboardData?.completedRequests ?? 0}
+          bgColor="bg-green-50"
+          textColor="text-green-600"
+          isLoading={loading && !isInitialMount.current}
+        />
+        <StatusCard
+          title="전체"
+          value={dashboardData?.totalRequests ?? 0}
+          bgColor="bg-indigo-50"
+          textColor="text-indigo-600"
+          isLoading={loading && !isInitialMount.current}
+        />
+      </div>
+    ),
+    [
+      dashboardData?.pendingRequests,
+      dashboardData?.completedRequests,
+      dashboardData?.totalRequests,
+      loading,
+      // isInitialMount.current 제거됨
+    ],
+  );
+
+  const statusChart = useMemo(() => {
+    if (!dashboardData) return null;
+
+    return (
+      <StatusChart
+        key={`chart-${updateCount}`}
+        sites={dashboardData.siteStatuses}
+        isLoading={loading && !isInitialMount.current}
+      />
+    );
+  }, [dashboardData, updateCount, loading]); // isInitialMount.current 제거됨
+
+  const statusTable = useMemo(() => {
+    if (!dashboardData) return null;
+
+    return (
+      <SiteStatusTable
+        key={`table-${updateCount}`}
+        sites={dashboardData.siteStatuses}
+        isLoading={loading && !isInitialMount.current}
+      />
+    );
+  }, [dashboardData, updateCount, loading]); // isInitialMount.current 제거됨
+
   if (loading && !dashboardData) {
-    // 최초 로딩 시에만 로딩 화면 표시 (갱신 시에는 이전 데이터 유지)
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
@@ -59,7 +172,6 @@ export default function Home() {
   }
 
   if (error && !dashboardData) {
-    // 최초 로드 시 오류가 발생한 경우에만 오류 화면 표시
     return (
       <Layout>
         <div className="bg-red-50 p-4 rounded-md">
@@ -89,7 +201,6 @@ export default function Home() {
     );
   }
 
-  // dashboardData가 null인 경우 처리
   if (!dashboardData) {
     return (
       <Layout>
@@ -105,7 +216,6 @@ export default function Home() {
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6"></h2>
 
-        {/* API 에러 알림 표시 */}
         {dashboardData.errors?.dashboard && (
           <div className="bg-red-50 p-4 rounded-md mb-4">
             <div className="flex">
@@ -168,7 +278,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* 갱신 중 오류 표시 */}
         {error && dashboardData && (
           <div className="bg-yellow-50 p-4 rounded-md mb-4">
             <div className="flex">
@@ -197,49 +306,18 @@ export default function Home() {
           </div>
         )}
 
-        {/* 스케줄링 제어 컴포넌트 - 데이터 갱신 함수 전달 */}
         <ScheduleIntervalSelector onDataRefresh={fetchDashboardData} />
 
-        {/* 로딩 중 표시 (이미 데이터가 있는 상태에서 갱신 중인 경우) */}
-        {loading && dashboardData && (
-          <div className="bg-blue-50 p-2 rounded-md mb-4 flex items-center">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
-            <p className="text-sm text-blue-700">
-              데이터를 갱신하는 중입니다...
-            </p>
+        {loading && !isInitialMount.current && (
+          <div className="fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg z-50 flex items-center">
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white mr-2"></div>
+            <span>데이터 갱신 중...</span>
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-          <StatusCard
-            title="미처리"
-            value={dashboardData.pendingRequests}
-            bgColor="bg-yellow-50"
-            textColor="text-yellow-600"
-          />
-          <StatusCard
-            title="완료"
-            value={dashboardData.completedRequests}
-            bgColor="bg-green-50"
-            textColor="text-green-600"
-          />
-          <StatusCard
-            title="전체"
-            value={dashboardData.totalRequests}
-            bgColor="bg-indigo-50"
-            textColor="text-indigo-600"
-          />
-        </div>
-
-        {/* 차트 컴포넌트 */}
-        {dashboardData.siteStatuses.length > 0 && (
-          <StatusChart sites={dashboardData.siteStatuses} />
-        )}
-
-        {/* 테이블 컴포넌트 */}
-        {dashboardData.siteStatuses.length > 0 && (
-          <SiteStatusTable sites={dashboardData.siteStatuses} />
-        )}
+        {statusCards}
+        {statusChart}
+        {statusTable}
       </div>
     </Layout>
   );

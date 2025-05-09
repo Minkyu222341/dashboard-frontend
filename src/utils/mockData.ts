@@ -16,7 +16,7 @@ export const mockSiteStatuses: SiteStatus[] = [
     pendingRequests: 23,
     completedRequests: 122,
     lastUpdatedAt: new Date().toISOString(),
-    sequence: 1,
+    sequence: 2,
   },
   {
     siteCode: 'site_b',
@@ -25,7 +25,7 @@ export const mockSiteStatuses: SiteStatus[] = [
     pendingRequests: 12,
     completedRequests: 77,
     lastUpdatedAt: new Date().toISOString(),
-    sequence: 2,
+    sequence: 1,
   },
   {
     siteCode: 'site_c',
