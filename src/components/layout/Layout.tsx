@@ -9,16 +9,13 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({
   children,
-  title = '헬프센터 대시보드',
+  title = '지원센터 현황',
 }) => {
   return (
     <>
       <Head>
         <title>{title}</title>
-        <meta
-          name="description"
-          content="헬프센터 지원 요청 모니터링 대시보드"
-        />
+        <meta name="description" content="지원센터 현황 모니터링 대시보드" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

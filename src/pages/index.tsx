@@ -20,6 +20,7 @@ export interface DashboardSummaryWithErrors extends DashboardSummary {
   errors?: {
     dashboard: boolean;
     accounts: boolean;
+    siteStatuses: boolean;
   };
 }
 

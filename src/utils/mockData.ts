@@ -17,6 +17,7 @@ export const mockSiteStatuses: SiteStatus[] = [
     completedRequests: 122,
     lastUpdatedAt: new Date().toISOString(),
     sequence: 2,
+    enabled: true,
   },
   {
     siteCode: 'site_b',
@@ -26,6 +27,7 @@ export const mockSiteStatuses: SiteStatus[] = [
     completedRequests: 77,
     lastUpdatedAt: new Date().toISOString(),
     sequence: 1,
+    enabled: true,
   },
   {
     siteCode: 'site_c',
@@ -35,6 +37,7 @@ export const mockSiteStatuses: SiteStatus[] = [
     completedRequests: 48,
     lastUpdatedAt: new Date().toISOString(),
     sequence: 3,
+    enabled: true,
   },
   {
     siteCode: 'site_d',
@@ -44,6 +47,7 @@ export const mockSiteStatuses: SiteStatus[] = [
     completedRequests: 150,
     lastUpdatedAt: new Date().toISOString(),
     sequence: 4,
+    enabled: true,
   },
   {
     siteCode: 'site_e',
@@ -53,6 +57,7 @@ export const mockSiteStatuses: SiteStatus[] = [
     completedRequests: 200,
     lastUpdatedAt: new Date().toISOString(),
     sequence: 5,
+    enabled: true,
   },
   {
     siteCode: 'site_f',
@@ -62,6 +67,7 @@ export const mockSiteStatuses: SiteStatus[] = [
     completedRequests: 250,
     lastUpdatedAt: new Date().toISOString(),
     sequence: 6,
+    enabled: true,
   },
   {
     siteCode: 'site_g',
@@ -71,6 +77,7 @@ export const mockSiteStatuses: SiteStatus[] = [
     completedRequests: 300,
     lastUpdatedAt: new Date().toISOString(),
     sequence: 7,
+    enabled: true,
   },
   {
     siteCode: 'site_h',
@@ -80,6 +87,7 @@ export const mockSiteStatuses: SiteStatus[] = [
     completedRequests: 220,
     lastUpdatedAt: new Date().toISOString(),
     sequence: 8,
+    enabled: true,
   },
   {
     siteCode: 'site_i',
@@ -89,6 +97,7 @@ export const mockSiteStatuses: SiteStatus[] = [
     completedRequests: 170,
     lastUpdatedAt: new Date().toISOString(),
     sequence: 9,
+    enabled: true,
   },
 ];
 
