@@ -102,19 +102,12 @@ export default function Home() {
   // 메모이제이션된 컴포넌트들 - 깜빡임 최소화를 위해 개선
   const statusCards = useMemo(
     () => (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-10">
         <StatusCard
           title="요청"
           value={dashboardData?.pendingRequests ?? 0}
           bgColor="bg-yellow-50"
           textColor="text-yellow-600"
-          isLoading={loading && !isInitialMount.current}
-        />
-        <StatusCard
-          title="완료"
-          value={dashboardData?.completedRequests ?? 0}
-          bgColor="bg-green-50"
-          textColor="text-green-600"
           isLoading={loading && !isInitialMount.current}
         />
         <StatusCard
@@ -128,7 +121,6 @@ export default function Home() {
     ),
     [
       dashboardData?.pendingRequests,
-      dashboardData?.completedRequests,
       dashboardData?.totalRequests,
       loading,
       // isInitialMount.current 제거됨

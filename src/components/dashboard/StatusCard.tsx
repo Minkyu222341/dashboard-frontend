@@ -17,6 +17,9 @@ const StatusCard = React.memo(function StatusCard({
   icon,
   isLoading = false,
 }: StatusCardProps) {
+  const formatNumber = (num: number): string => {
+    return num.toLocaleString('ko-KR');
+  };
   return (
     <div
       className={`${bgColor} rounded-lg shadow-md p-5 relative overflow-hidden`}
@@ -29,7 +32,9 @@ const StatusCard = React.memo(function StatusCard({
       <div className="flex justify-between items-center">
         <div>
           <p className={`text-sm ${textColor}`}>{title}</p>
-          <p className="text-2xl font-bold mt-1 text-gray-900">{value}</p>
+          <p className="text-2xl font-bold mt-1 text-gray-900">
+            {formatNumber(value)}
+          </p>
         </div>
         {icon && <div className="text-2xl">{icon}</div>}
       </div>

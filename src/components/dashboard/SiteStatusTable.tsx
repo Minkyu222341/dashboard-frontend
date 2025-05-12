@@ -45,6 +45,10 @@ const SiteStatusTable = React.memo(function SiteStatusTable({
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   };
 
+  const formatNumber = (num: number): string => {
+    return num.toLocaleString('ko-KR');
+  };
+
   // 사이트별 활성화 상태 변경 처리
   const handleToggleStatus = async (
     siteCode: string,
@@ -162,11 +166,11 @@ const SiteStatusTable = React.memo(function SiteStatusTable({
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900 flex items-center space-x-1">
                     <span className="w-12 text-right font-medium">
-                      {site.pendingRequests}
+                      {formatNumber(site.pendingRequests)}
                     </span>
                     <span>/</span>
                     <span className="w-12 text-left font-medium">
-                      {site.totalRequests}
+                      {formatNumber(site.totalRequests)}
                     </span>
                   </div>
                 </td>

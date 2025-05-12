@@ -170,7 +170,7 @@ const ScheduleIntervalSelector: React.FC<ScheduleIntervalSelectorProps> = ({
           {/* 활성화/비활성화 토글 버튼 */}
           <div className="flex items-center whitespace-nowrap min-w-44">
             <span className="mr-3 text-sm font-medium text-gray-700 w-20">
-              {schedulingEnabled ? '활성화됨' : '비활성화됨'}
+              {schedulingEnabled ? '활성화' : '비활성화'}
             </span>
             <label
               className={`relative inline-flex items-center ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
