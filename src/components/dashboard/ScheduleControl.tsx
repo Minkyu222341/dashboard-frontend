@@ -4,6 +4,7 @@ import {
   getScheduleStatus,
   setScheduleStatus,
 } from '@/services/scheduleService';
+import DateRangeSelector from './DateRangeSelector';
 
 const INTERVAL_OPTIONS = [
   { value: 10000, label: '10초' },
@@ -15,10 +16,20 @@ const INTERVAL_OPTIONS = [
 
 interface ScheduleIntervalSelectorProps {
   onDataRefresh: () => void;
+  startDate: string | null;
+  endDate: string | null;
+  onStartDateChange: (date: string | null) => void;
+  onEndDateChange: (date: string | null) => void;
+  onSearch: () => void;
 }
 
 const ScheduleIntervalSelector: React.FC<ScheduleIntervalSelectorProps> = ({
   onDataRefresh,
+  startDate,
+  endDate,
+  onStartDateChange,
+  onEndDateChange,
+  onSearch,
 }) => {
   // 기본 선택 값을 60000(1분)으로 변경
   const [selectedInterval, setSelectedInterval] = useState<number>(60000);
@@ -226,6 +237,17 @@ const ScheduleIntervalSelector: React.FC<ScheduleIntervalSelectorProps> = ({
           {error}
         </div>
       )}
+
+      {/* 날짜 선택 컴포넌트 추가 */}
+      <div className="flex justify-end mt-5">
+        <DateRangeSelector
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={onStartDateChange}
+          onEndDateChange={onEndDateChange}
+          onSearch={onSearch}
+        />
+      </div>
     </div>
   );
 };

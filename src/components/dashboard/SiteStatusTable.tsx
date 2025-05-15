@@ -125,7 +125,7 @@ const SiteStatusTable = React.memo(function SiteStatusTable({
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
                 <div className="flex items-center space-x-1">
-                  <span className="w-12 text-right">요청</span>
+                  <span className="w-12 text-right">완료</span>
                   <span>/</span>
                   <span className="w-12 text-left">전체</span>
                 </div>
@@ -166,7 +166,7 @@ const SiteStatusTable = React.memo(function SiteStatusTable({
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900 flex items-center space-x-1">
                     <span className="w-12 text-right font-medium">
-                      {formatNumber(site.pendingRequests)}
+                      {formatNumber(site.completedRequests)}
                     </span>
                     <span>/</span>
                     <span className="w-12 text-left font-medium">
@@ -194,7 +194,7 @@ const SiteStatusTable = React.memo(function SiteStatusTable({
                           }
                           className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
                       </label>
                     )}
                   </div>

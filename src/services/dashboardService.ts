@@ -8,7 +8,7 @@ export interface SiteStatus {
   lastUpdatedAt: string;
   loginId?: string;
   sequence: number;
-  enabled: boolean; // 추가된 필드
+  enabled: boolean;
 }
 
 // 대시보드 요약 정보 타입
@@ -21,7 +21,7 @@ export interface DashboardSummary {
   errors?: {
     dashboard: boolean;
     accounts: boolean;
-    siteStatuses: boolean; // 크롤러 상태 API 오류 추가
+    siteStatuses: boolean;
   };
 }
 
@@ -43,7 +43,7 @@ export interface AccountInfoResponseDto {
   loginId: string;
 }
 
-// 사이트 상태 응답 타입 추가
+// 사이트 상태 응답 타입
 export interface SiteStatusResponseDto {
   siteCode: string;
   siteName: string;
@@ -52,24 +52,50 @@ export interface SiteStatusResponseDto {
   updatedAt: string;
 }
 
+// 검색 조건 타입 추가
+export interface DashboardSearchParams {
+  startDate?: string;
+  endDate?: string;
+}
+
 // 백엔드 API URL
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function getDashboardSummary(): Promise<DashboardSummary> {
+export async function getDashboardSummary(
+  searchParams?: DashboardSearchParams,
+): Promise<DashboardSummary> {
   // 대시보드 데이터 가져오기
   let dashboardData: DashBoardResponseDto[] = [];
   let dashboardError = false;
 
   try {
-    const dashboardResponse = await fetch(`${API_URL}/dashboard`);
+    // 검색 파라미터가 있으면 URL에 추가
+    let url = `${API_URL}/dashboard`;
+
+    if (searchParams) {
+      const queryParams = new URLSearchParams();
+
+      if (searchParams.startDate) {
+        queryParams.append('startDate', searchParams.startDate);
+      }
+
+      if (searchParams.endDate) {
+        queryParams.append('endDate', searchParams.endDate);
+      }
+
+      const queryString = queryParams.toString();
+      if (queryString) {
+        url += `?${queryString}`;
+      }
+    }
+
+    const dashboardResponse = await fetch(url);
     if (dashboardResponse.ok) {
       dashboardData = await dashboardResponse.json();
     } else {
-      console.error(`대시보드 API 호출 오류: ${dashboardResponse.status}`);
       dashboardError = true;
     }
   } catch (error) {
-    console.error('대시보드 데이터 가져오기 실패:', error);
     dashboardError = true;
   }
 
@@ -82,11 +108,9 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
     if (accountsResponse.ok) {
       accountsData = await accountsResponse.json();
     } else {
-      console.error(`계정 API 호출 오류: ${accountsResponse.status}`);
       accountsError = true;
     }
   } catch (error) {
-    console.error('계정 정보 가져오기 실패:', error);
     accountsError = true;
   }
 
@@ -101,13 +125,9 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
     if (siteStatusesResponse.ok) {
       siteStatusesData = await siteStatusesResponse.json();
     } else {
-      console.error(
-        `사이트 상태 API 호출 오류: ${siteStatusesResponse.status}`,
-      );
       siteStatusesError = true;
     }
   } catch (error) {
-    console.error('사이트 상태 데이터 가져오기 실패:', error);
     siteStatusesError = true;
   }
 
@@ -137,7 +157,7 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
       (accountsError ? '계정 정보 조회 실패' : '정보 없음'),
     enabled: siteStatusesError
       ? true
-      : (siteStatusMap.get(item.siteCode) ?? true), // 기본값은 활성화(true)
+      : (siteStatusMap.get(item.siteCode) ?? true),
   }));
 
   // 요약 정보 계산
@@ -174,14 +194,12 @@ export async function getAccountInfo(): Promise<AccountInfoResponseDto | null> {
     const response = await fetch(`${API_URL}/account`);
 
     if (!response.ok) {
-      console.error(`API 호출 오류: ${response.status}`);
       return null;
     }
 
     const data: AccountInfoResponseDto = await response.json();
     return data;
   } catch (error) {
-    console.error('계정 정보 가져오기 실패:', error);
     return null;
   }
 }

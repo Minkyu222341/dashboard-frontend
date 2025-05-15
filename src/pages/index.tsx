@@ -10,10 +10,12 @@ import StatusCard from '@/components/dashboard/StatusCard';
 import SiteStatusTable from '@/components/dashboard/SiteStatusTable';
 import StatusChart from '@/components/dashboard/StatusChart';
 import ScheduleIntervalSelector from '@/components/dashboard/ScheduleControl';
+import DateRangeSelector from '@/components/dashboard/DateRangeSelector'; // 새로 추가
 
 import {
   getDashboardSummary,
   DashboardSummary,
+  DashboardSearchParams, // 새로 추가
 } from '@/services/dashboardService';
 
 export interface DashboardSummaryWithErrors extends DashboardSummary {
@@ -33,6 +35,10 @@ export default function Home() {
   const isInitialMount = useRef(true);
   const dataFetchingRef = useRef(false);
 
+  // 날짜 선택 상태 추가
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
+
   // 대시보드 데이터 가져오기 함수
   const fetchDashboardData = useCallback(async () => {
     if (dataFetchingRef.current) return; // 이미 데이터를 가져오는 중이면 중복 호출 방지
@@ -45,7 +51,13 @@ export default function Home() {
         setLoading(true);
       }
 
-      const data = await getDashboardSummary();
+      // 검색 파라미터 구성
+      const searchParams: DashboardSearchParams = {};
+      if (startDate) searchParams.startDate = startDate;
+      if (endDate) searchParams.endDate = endDate;
+
+      // 수정된 getDashboardSummary 호출
+      const data = await getDashboardSummary(searchParams);
 
       // 이전 데이터와 비교하여 변경된 경우에만 상태 업데이트
       setDashboardData(prevData => {
@@ -92,22 +104,31 @@ export default function Home() {
       setLoading(false);
       dataFetchingRef.current = false;
     }
-  }, []);
+  }, [startDate, endDate]); // 의존성 배열에 날짜 추가
 
   // 초기 데이터 로드
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  // 메모이제이션된 컴포넌트들 - 깜빡임 최소화를 위해 개선
+  // 날짜 변경 핸들러
+  const handleStartDateChange = useCallback((date: string | null) => {
+    setStartDate(date);
+  }, []);
+
+  const handleEndDateChange = useCallback((date: string | null) => {
+    setEndDate(date);
+  }, []);
+
+  // 메모이제이션된 컴포넌트들 - 기존 코드
   const statusCards = useMemo(
     () => (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-10">
         <StatusCard
-          title="요청"
-          value={dashboardData?.pendingRequests ?? 0}
-          bgColor="bg-yellow-50"
-          textColor="text-yellow-600"
+          title="완료"
+          value={dashboardData?.completedRequests ?? 0}
+          bgColor="bg-green-50"
+          textColor="text-green-600"
           isLoading={loading && !isInitialMount.current}
         />
         <StatusCard
@@ -119,12 +140,7 @@ export default function Home() {
         />
       </div>
     ),
-    [
-      dashboardData?.pendingRequests,
-      dashboardData?.totalRequests,
-      loading,
-      // isInitialMount.current 제거됨
-    ],
+    [dashboardData?.completedRequests, dashboardData?.totalRequests, loading],
   );
 
   const statusChart = useMemo(() => {
@@ -137,7 +153,7 @@ export default function Home() {
         isLoading={loading && !isInitialMount.current}
       />
     );
-  }, [dashboardData, updateCount, loading]); // isInitialMount.current 제거됨
+  }, [dashboardData, updateCount, loading]);
 
   const statusTable = useMemo(() => {
     if (!dashboardData) return null;
@@ -149,7 +165,7 @@ export default function Home() {
         isLoading={loading && !isInitialMount.current}
       />
     );
-  }, [dashboardData, updateCount, loading]); // isInitialMount.current 제거됨
+  }, [dashboardData, updateCount, loading]);
 
   if (loading && !dashboardData) {
     return (
@@ -299,7 +315,14 @@ export default function Home() {
           </div>
         )}
 
-        <ScheduleIntervalSelector onDataRefresh={fetchDashboardData} />
+        <ScheduleIntervalSelector
+          onDataRefresh={fetchDashboardData}
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={handleStartDateChange}
+          onEndDateChange={handleEndDateChange}
+          onSearch={fetchDashboardData} // 검색 버튼 클릭 시에도 같은 함수를 사용
+        />
 
         {loading && !isInitialMount.current && (
           <div className="fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg z-50 flex items-center">

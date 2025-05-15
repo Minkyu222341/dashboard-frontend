@@ -47,7 +47,7 @@ export async function setScheduleStatus(
   enabled: boolean,
 ): Promise<ScheduleStatusResponse> {
   try {
-    const response = await api.post('/schedule/control', {
+    const response = await api.put('/schedule/status', {
       status: enabled,
     });
     return response.data;
@@ -132,7 +132,7 @@ export async function setSiteStatus(
   enabled: boolean,
 ): Promise<SiteStatusResponse> {
   try {
-    const response = await api.post(`/schedule/sites/${siteCode}/control`, {
+    const response = await api.put(`/schedule/sites/${siteCode}/status`, {
       enabled: enabled,
     });
     return response.data;

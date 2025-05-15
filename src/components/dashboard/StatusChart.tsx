@@ -31,14 +31,14 @@ const StatusChart = React.memo(function StatusChart({
       labels: sortedSites.map(site => site.siteName),
       datasets: [
         {
-          label: '요청',
-          data: sortedSites.map(site => site.pendingRequests),
-          backgroundColor: '#fbbf24', // 노란색
+          label: '완료',
+          data: sortedSites.map(site => site.completedRequests),
+          backgroundColor: '#6EE7B7', // 노란색
         },
         {
           label: '전체',
           data: sortedSites.map(site => site.totalRequests),
-          backgroundColor: '#60a5fa', // 파란색
+          backgroundColor: '#60A5FA', // 파란색
         },
       ],
     }),
@@ -55,6 +55,11 @@ const StatusChart = React.memo(function StatusChart({
     // canvas 요소가 존재하는지 확인
     const canvas = chartRef.current;
     if (!canvas) return;
+
+    // 데이터 최대값 계산
+    const maxValue = Math.max(
+      ...chartData.datasets.flatMap(dataset => dataset.data as number[]),
+    );
 
     // 새 차트 인스턴스 생성
     chartInstance.current = new ChartJS(canvas, {
@@ -81,10 +86,10 @@ const StatusChart = React.memo(function StatusChart({
                 return chartData.labels[tooltipItems[0].dataIndex];
               },
               label: function (tooltipItem) {
-                // 툴팁에 정수값만 표시
+                // 툴팁에 정수값만 표시 (천 단위 구분자 추가)
                 const datasetLabel = tooltipItem.dataset.label || '';
-                const value = tooltipItem.parsed.y;
-                return `${datasetLabel}: ${Math.round(value)}`;
+                const value = Math.round(tooltipItem.parsed.y);
+                return `${datasetLabel}: ${value.toLocaleString()}`;
               },
             },
           },
@@ -113,15 +118,39 @@ const StatusChart = React.memo(function StatusChart({
           y: {
             beginAtZero: true,
             ticks: {
+              // 깔끔한 눈금 표시를 위한 콜백 함수 - 천 단위 구분자 추가
               callback: function (value) {
-                if (typeof value === 'number' && Math.floor(value) === value) {
-                  return value;
+                const numValue = Number(value);
+
+                // 유효한 숫자가 아니면 표시하지 않음
+                if (isNaN(numValue)) return null;
+
+                // 눈금 간격 기준 확인 (표시할 값인지)
+                let shouldDisplay = false;
+
+                // 0은 항상 표시
+                if (numValue === 0) shouldDisplay = true;
+                // 데이터 범위에 따라 적절한 간격으로 눈금 표시
+                else if (maxValue > 500) {
+                  shouldDisplay = numValue % 100 === 0;
+                } else if (maxValue > 200) {
+                  shouldDisplay = numValue % 50 === 0;
+                } else if (maxValue > 100) {
+                  shouldDisplay = numValue % 20 === 0;
+                } else if (maxValue > 50) {
+                  shouldDisplay = numValue % 10 === 0;
+                } else if (maxValue > 20) {
+                  shouldDisplay = numValue % 5 === 0;
+                } else {
+                  shouldDisplay = Number.isInteger(numValue);
                 }
-                return null; // 소수점이 있는 값이나 숫자가 아닌 값은 표시하지 않음
+
+                // 표시할 값이면 천 단위 구분자 추가하여 반환
+                return shouldDisplay ? numValue.toLocaleString() : null;
               },
-              stepSize: 1, // 눈금 간격을 1로 설정
               precision: 0, // 소수점 표시 안함
             },
+            // 격자 설정
             grid: {
               color: 'rgba(0, 0, 0, 0.1)', // 더 밝은 그리드 라인
             },
