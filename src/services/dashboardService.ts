@@ -50,6 +50,7 @@ export interface SiteStatusResponseDto {
   enabled: boolean;
   createdAt: string;
   updatedAt: string;
+  sequence: number;
 }
 
 // 검색 조건 타입 추가
@@ -60,7 +61,6 @@ export interface DashboardSearchParams {
 
 // 백엔드 API URL
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
 export async function getDashboardSummary(
   searchParams?: DashboardSearchParams,
 ): Promise<DashboardSummary> {
@@ -143,22 +143,36 @@ export async function getDashboardSummary(
     siteStatusMap.set(status.siteCode, status.enabled);
   });
 
-  // 사이트 상태 정보, 계정 정보, 활성화 상태 조합
-  const siteStatuses: SiteStatus[] = dashboardData.map(item => ({
-    siteCode: item.siteCode,
-    siteName: item.siteName,
-    totalRequests: item.totalCount || 0,
-    pendingRequests: item.notCompletedCount || 0,
-    completedRequests: item.completedCount || 0,
-    sequence: item.sequence || 0,
-    lastUpdatedAt: item.lastUpdatedAt || new Date().toISOString(),
-    loginId:
-      accountMap.get(item.siteCode) ||
-      (accountsError ? '계정 정보 조회 실패' : '정보 없음'),
-    enabled: siteStatusesError
-      ? true
-      : (siteStatusMap.get(item.siteCode) ?? true),
-  }));
+  // 대시보드 데이터로 맵 생성 (코드 추가)
+  const dashboardMap = new Map<string, DashBoardResponseDto>();
+  dashboardData.forEach(item => {
+    dashboardMap.set(item.siteCode, item);
+  });
+
+  // 사이트 상태 정보, 계정 정보, 활성화 상태 조합 (수정)
+  // 모든 사이트를 기준으로 변경
+  const siteStatuses: SiteStatus[] = siteStatusesData.map(site => {
+    // 대시보드 데이터에 해당 사이트가 있는지 확인
+    const dashboardItem = dashboardMap.get(site.siteCode);
+
+    console.log(site.sequence);
+    // 대시보드 데이터가 있으면 해당 데이터 사용, 없으면 기본값(0) 사용
+    return {
+      siteCode: site.siteCode,
+      siteName: site.siteName,
+      totalRequests: dashboardItem?.totalCount || 0,
+      pendingRequests: dashboardItem?.notCompletedCount || 0,
+      completedRequests: dashboardItem?.completedCount || 0,
+      sequence: site.sequence || 9,
+      lastUpdatedAt: dashboardItem?.lastUpdatedAt || new Date().toISOString(),
+      loginId:
+        accountMap.get(site.siteCode) ||
+        (accountsError ? '계정 정보 조회 실패' : '정보 없음'),
+      enabled: siteStatusesError
+        ? true
+        : (siteStatusMap.get(site.siteCode) ?? true),
+    };
+  });
 
   // 요약 정보 계산
   const totalSites = siteStatuses.length;
@@ -188,7 +202,6 @@ export async function getDashboardSummary(
     },
   };
 }
-
 export async function getAccountInfo(): Promise<AccountInfoResponseDto | null> {
   try {
     const response = await fetch(`${API_URL}/account`);

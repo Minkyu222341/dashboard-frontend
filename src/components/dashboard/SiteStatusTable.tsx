@@ -2,6 +2,20 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { SiteStatus } from '@/services/dashboardService';
 import { setSiteStatus } from '@/services/scheduleService';
 
+// 사이트 코드별 로그인 URL 매핑 - 컴포넌트 외부에 선언
+const siteLoginUrls: Record<string, string> = {
+  GNE: 'https://login.gne.go.kr/authentication/multi/multiLogin.html?agentId=110&useOauth=0',
+  CHANGWON: 'https://www.changwon.ac.kr/helpcenter/lo/login/loginPage.do',
+  BUSAN_SCHOOL: 'https://school.busanedu.net/help/lo/login/loginPage.do',
+  BUSAN_ADMIN: 'https://home.pen.go.kr/helpcenter/lo/login/loginTmpr.do',
+  BUSAN_MAIN:
+    'https://www.pen.go.kr/common/lo/login/loginPage.do?retUrl=https%3A%2F%2Fwww.pen.go.kr%2Fhelp%2Fmain.do&retSysId=help',
+  SNUE: 'https://www.snue.ac.kr/help/lo/login/loginPage.do',
+  GNU: 'https://www.gnu.ac.kr/main/lo/login/loginPage.do',
+  kmou: 'https://www.kmou.ac.kr/kmou/lo/login/loginPage.do?mi=3510',
+  care: 'https://care.pen.go.kr/common/lo/login/loginPage.do?retUrl=https%3A%2F%2Fcare.pen.go.kr%2Fhelp%2Fmain.do&retSysId=help',
+};
+
 interface SiteStatusTableProps {
   sites: SiteStatus[];
   isLoading?: boolean;
@@ -159,9 +173,15 @@ const SiteStatusTable = React.memo(function SiteStatusTable({
                   {index + 1}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap pl-20">
-                  <div className="text-sm font-medium text-gray-900">
+                  {/* 사이트 이름을 클릭 가능한 링크로 변경 */}
+                  <a
+                    href={siteLoginUrls[site.siteCode] || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                  >
                     {site.siteName}
-                  </div>
+                  </a>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900 flex items-center space-x-1">

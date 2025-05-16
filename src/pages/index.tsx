@@ -34,10 +34,10 @@ export default function Home() {
   const [updateCount, setUpdateCount] = useState<number>(0);
   const isInitialMount = useRef(true);
   const dataFetchingRef = useRef(false);
-
-  // 날짜 선택 상태 추가
-  const [startDate, setStartDate] = useState<string | null>(null);
-  const [endDate, setEndDate] = useState<string | null>(null);
+  // 날짜 선택 상태 추가 - 오늘 날짜로 초기화
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD 형식
+  const [startDate, setStartDate] = useState<string | null>(today);
+  const [endDate, setEndDate] = useState<string | null>(today);
 
   // 대시보드 데이터 가져오기 함수
   const fetchDashboardData = useCallback(async () => {
