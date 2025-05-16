@@ -16,7 +16,9 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
   onSearch,
 }) => {
   // 날짜 기간 버튼 핸들러
-  const handlePeriodClick = (period: 'all' | 'month' | 'week' | 'today') => {
+  const handlePeriodClick = (
+    period: 'all' | 'year' | 'month' | 'week' | 'today',
+  ) => {
     const today = new Date();
     const endDateStr = today.toISOString().split('T')[0]; // 종료일은 항상 오늘
 
@@ -25,6 +27,12 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
     switch (period) {
       case 'all':
         startDateStr = null; // 시작일을 null로 설정하여 전체 기간 조회
+        break;
+      case 'year':
+        // 일 년 전
+        const yearAgo = new Date(today);
+        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+        startDateStr = yearAgo.toISOString().split('T')[0];
         break;
       case 'month':
         // 한 달 전
@@ -65,6 +73,12 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
             className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm"
           >
             전체
+          </button>
+          <button
+            onClick={() => handlePeriodClick('year')}
+            className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm"
+          >
+            일년
           </button>
           <button
             onClick={() => handlePeriodClick('month')}
