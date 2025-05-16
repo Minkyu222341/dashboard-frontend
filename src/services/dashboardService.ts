@@ -155,7 +155,6 @@ export async function getDashboardSummary(
     // 대시보드 데이터에 해당 사이트가 있는지 확인
     const dashboardItem = dashboardMap.get(site.siteCode);
 
-    console.log(site.sequence);
     // 대시보드 데이터가 있으면 해당 데이터 사용, 없으면 기본값(0) 사용
     return {
       siteCode: site.siteCode,
